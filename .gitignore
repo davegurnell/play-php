@@ -1,31 +1,17 @@
-target
-project/boot
-project/build/target
-project/plugins/target
-*/project/boot
-*/target
+*.class
+*.log
 
+# sbt specific
+.cache/
+.history/
+.lib/
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
 
-
-# eclipse conf file
-.settings
-.classpath
-.project
-.manager
-.externalToolBuilders
-
-
-# IntelliJ
-*.iml
-*.ipr
-*.iws
-.idea
-.idea_modules
-.history
-*.*___jb_old___
-*.*___jb_bak___
-.idea/libraries/
-.idea/artifacts/
-
-# Sublime
-*.sublime-workspace
+# Scala-IDE specific
+.scala_dependencies
+.worksheet
