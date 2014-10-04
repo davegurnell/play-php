@@ -77,6 +77,7 @@ object PhpSerializer {
       output.write(NullStart)
       output.write(ValueEnd)
     case PhpUndefined =>
-      // Do nothing
+      output.write(NullStart)
+      output.write(ValueEnd)
   }
 }

@@ -26,7 +26,12 @@ case class PhpPath(path: Seq[PhpPathNode]) extends PhpValueWrapperImplicits {
     case _          => PhpError(this, "error.path.result.multiple")
   }
 
-  override def toString = "PhpPath(__ " + path.map(_.pathString).mkString(" ") + ")"
+  def read[A](implicit r: PhpReads[A]): PhpReads[A] =
+    PhpReads[A] { value =>
+      extractOne(value).flatMap(r.reads(_).repath(this))
+    }
+
+  override def toString = "PhpPath(" + ("__" +: path.map(_.pathString)).mkString(" ") + ")"
 }
 
 sealed trait PhpPathNode {

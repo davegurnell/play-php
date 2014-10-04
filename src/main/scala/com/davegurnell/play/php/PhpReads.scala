@@ -4,18 +4,44 @@ import java.nio.charset.Charset
 import scala.language.higherKinds
 import scala.collection.generic
 import play.api.data.validation.ValidationError
+import play.api.libs.functional.{ Applicative, Functor }
 
 /**
  * Object that can read `PhpValues` as type `A`.
  */
 trait PhpReads[+A] {
   def reads(value: PhpValue): PhpResult[A]
+
+  def map[B](func: A => B): PhpReads[B] =
+    PhpReads[B] { value => this.reads(value).map(func) }
 }
 
 object PhpReads extends DefaultPhpReads {
   /** Construct a `PhpReads` from a function. */
   def apply[A](r: PhpValue => PhpResult[A]): PhpReads[A] =
     new PhpReads[A] { def reads(value: PhpValue) = r(value) }
+
+  implicit val applicative: Applicative[PhpReads] =
+    new Applicative[PhpReads] {
+      def pure[A](value: A): PhpReads[A] =
+        PhpReads[A] { _ =>
+          PhpSuccess(value)
+        }
+
+      def map[A, B](m: PhpReads[A], f: A => B): PhpReads[B] =
+        m.map(f)
+
+      def apply[A, B](mf: PhpReads[A => B], ma: PhpReads[A]): PhpReads[B] =
+        PhpReads[B] { value =>
+          PhpResult.applicative(mf.reads(value), ma.reads(value))
+        }
+    }
+
+  implicit val functor: Functor[PhpReads] =
+    new Functor[PhpReads] {
+      def fmap[A, B](reads: PhpReads[A], f: A => B): PhpReads[B] =
+        reads.map(f)
+    }
 }
 
 trait DefaultPhpReads {

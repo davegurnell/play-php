@@ -145,6 +145,4 @@ class PhpReadsSpec extends WordSpec with Matchers {
       Php.fromPhp[Map[Int, Map[String, Map[Boolean, Int]]]](value) should equal(expected)
     }
   }
-
-  ""
 }

@@ -9,7 +9,7 @@ package com.davegurnell.play.php
  */
 
 import java.io._
-import scala.collection.immutable.Queue
+import scala.collection.immutable.Vector
 
 object PhpParser {
   val IntStart     = 'i'.toByte
@@ -119,7 +119,7 @@ class PhpParser(input: InputStream) {
         skip(ArgDelim)
         val length = readInt(ArgDelim)
         skip(FieldsStart)
-        var fields = Queue.empty[(PhpValue, PhpValue)]
+        var fields = Vector.empty[(PhpValue, PhpValue)]
         for(i <- 0 until length) {
           val name  = parse()
           val value = parse()
@@ -136,7 +136,7 @@ class PhpParser(input: InputStream) {
         skip(ArgDelim)
         val length = readInt(ArgDelim)
         skip(FieldsStart)
-        var fields = Queue.empty[(PhpValue, PhpValue)]
+        var fields = Vector.empty[(PhpValue, PhpValue)]
         for(i <- 0 until length) {
           val name  = parse()
           val value = parse()
