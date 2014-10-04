@@ -1,16 +1,19 @@
 Play PHP
 ========
 
-Copyright 2014 Dave Gurnell. Released under the Apache 2.0 license.
+Copyright 2014 Dave Gurnell. Released under the MIT license.
 
-A library for reading/writing serialized PHP data using the Play functional libraries.
-
+A Play-JSON-like API for reading and writing serialized PHP data.
 Compatible with Play 2.3.4 and Scala 2.11.2.
+
+Originally based on the [serialized-php-parser] Java project.
+
+[serialized-php-parser]: https://code.google.com/p/serialized-php-parser
 
 About
 -----
 
-A Play-JSON-like API for reading and writing serialized PHP data:
+Key features:
 
  - a `PhpValue` data type with subtypes for the various data types in serialized PHP
    (int, double, boolean, string, array, object, and null);

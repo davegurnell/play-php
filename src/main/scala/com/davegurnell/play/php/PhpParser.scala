@@ -11,6 +11,9 @@ package com.davegurnell.play.php
 import java.io._
 import scala.collection.immutable.Vector
 
+/**
+ * Front-end for a parser that extracts `PhpValues` from `Array[Byte]` values.
+ */
 object PhpParser {
   val IntStart     = 'i'.toByte
   val DoubleStart  = 'd'.toByte
@@ -29,19 +32,35 @@ object PhpParser {
   val TrueValue    = '1'.toByte
   val FalseValue   = '0'.toByte
 
+  /**
+   * Convert `input` to a byte array using the platform default character encoding
+   * and parse it as a `PhpValue`.
+   */
   def apply(input: String): PhpValue =
     new PhpParser(new ByteArrayInputStream(input.getBytes)).parse()
 
+  /**
+   * Parse `input` as a `PhpValue`. Throw a `PhpParserException` if parsing fails.
+   */
   def apply(input: Array[Byte]): PhpValue =
     new PhpParser(new ByteArrayInputStream(input)).parse()
 
+  /**
+   * Parse `input` as a `PhpValue`. Throw a `PhpParserException` if parsing fails.
+   *
+   * Does not necessarily exhaust all content in `input`.
+   */
   def apply(input: InputStream): PhpValue =
     new PhpParser(input).parse()
 }
 
-class PhpParser(input: InputStream) {
+/**
+ * `PhpParser` implementation -- see the companion object for the public parser interface.
+ */
+private[php] class PhpParser(input: InputStream) {
   import PhpParser._
 
+  /** Position in `input` (for error reporting). */
   var position = 0L
 
   def error(message: String) =

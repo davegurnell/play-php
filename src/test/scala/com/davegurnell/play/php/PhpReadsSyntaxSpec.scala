@@ -31,8 +31,8 @@ class PhpReadsSyntaxSpec extends WordSpec with Matchers {
       )
 
       val expected = PhpError(Seq(
-        (PhpPath \ "lon") -> Seq(ValidationError("error.expected.phpdouble")),
-        (PhpPath \ "lat") -> Seq(ValidationError("error.expected.phpdouble"))
+        (PhpPath \ "lat") -> Seq(ValidationError("error.expected.phpdouble")),
+        (PhpPath \ "lon") -> Seq(ValidationError("error.expected.phpdouble"))
       ))
 
       Php.fromPhp[Location](value) should equal(expected)

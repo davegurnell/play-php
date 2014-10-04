@@ -10,15 +10,20 @@ package com.davegurnell.play.php
 
 import java.io._
 
+/**
+ * API for serializing `PhpValues` as `Array[Bytes]`.
+ */
 object PhpSerializer {
   import PhpParser._
 
+  /** Serialize `value` as an `Arrah[Bytes]`. */
   def apply(value: PhpValue): Array[Byte] = {
     val output = new ByteArrayOutputStream
     apply(value, output)
     output.toByteArray
   }
 
+  /** Write a serialized form of `value` to `output`. */
   def apply(value: PhpValue, output: OutputStream): Unit = value match {
     case PhpInt(value) =>
       output.write(IntStart)

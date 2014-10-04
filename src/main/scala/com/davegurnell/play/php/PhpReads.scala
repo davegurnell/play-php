@@ -44,6 +44,10 @@ object PhpReads extends DefaultPhpReads {
     }
 }
 
+/**
+ * Implementations of `PhpReads` for common data types,
+ * all of which are provided by default via implicit scope.
+ */
 trait DefaultPhpReads {
   implicit val phpValueReads: PhpReads[PhpValue] =
     new PhpReads[PhpValue] {
@@ -99,7 +103,7 @@ trait DefaultPhpReads {
       }
     }
 
-  // This code adapted directly from Play JSON's default traversableReads:
+  // This code adapted directly from Play JSON's default mapReads:
   implicit def mapReads[A, B](implicit ra: PhpReads[A], rb: PhpReads[B]): PhpReads[Map[A, B]] =
     new PhpReads[Map[A, B]] {
       def reads(in: PhpValue) = in match {

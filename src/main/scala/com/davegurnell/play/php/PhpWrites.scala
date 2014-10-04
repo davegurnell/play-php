@@ -13,6 +13,10 @@ object PhpWrites extends DefaultPhpWrites {
     new PhpWrites[A] { def writes(value: A) = w(value) }
 }
 
+/**
+ * Implementations of `PhpWrites` for common data types,
+ * all of which are provided by default via implicit scope.
+ */
 trait DefaultPhpWrites {
   implicit val phpValueWrites = new PhpWrites[PhpValue] {
     def writes(in: PhpValue) = in

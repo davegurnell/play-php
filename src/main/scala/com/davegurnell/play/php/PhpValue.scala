@@ -9,7 +9,7 @@ sealed trait PhpValue {
   /**
    * Retrieve a child keyed with `field`, or `PhpUndefined` if no such child is found.
    *
-   *     val arr = PhpArray(Map(
+   *     val arr = PhpArray(Seq(
    *       PhpString("a") -> PhpString("b")
    *     ))
    *
@@ -21,13 +21,13 @@ sealed trait PhpValue {
   /**
    * Recursively search for descendents a keyed with `field`:
    *
-   *     val arr = PhpArray(Map(
-   *       PhpString("a") -> PhpArray(Map(
+   *     val arr = PhpArray(Seq(
+   *       PhpString("a") -> PhpArray(Seq(
    *         PhpString("b") -> PhpString("c")
    *       ))
    *     ))
    *
-   *     (arr \\ "a")      // == Seq(PhpOArray(Map(PhpString("b") -> PhpString("c"))))
+   *     (arr \\ "a")      // == Seq(PhpOArray(Seq(PhpString("b") -> PhpString("c"))))
    *     (arr \\ "b")      // == Seq(PhpString("c"))
    *     (arr \ "missing") // == Seq()
    */

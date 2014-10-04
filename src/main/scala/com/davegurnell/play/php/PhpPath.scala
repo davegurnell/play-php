@@ -5,36 +5,66 @@ import play.api.data.validation.ValidationError
 object PhpPath extends PhpPath(Seq.empty) with PhpValueWrapperImplicits
 
 /**
- * Object representing a path into a `PhpValue`.
+ * A path into a `PhpValue` that can be used to search for and extract
+ * fields from a specified location:
  *
- * Used to create `PhpReads` and `PhpWrites` that inspect the values at that point.
+ * {{{
+ * val path = PhpPath \ "a" \ "b"
+ * val php  = Php.arr("a" -> Php.arr("b" -> 123))
+ * val ans  = path.apply(php)
+ * // ans == PhpInt(123)
+ * }}}
+ *
+ * Use the `\` method to construct paths that search for immediate children,
+ * and the `\\` method to construct paths that search for arbitarary descendents.
+ *
+ * Paths are also used to create `PhpReads` and `PhpWrites` that extract/insert
+ * values at the relevant location.
  */
 case class PhpPath(path: Seq[PhpPathNode]) extends PhpValueWrapperImplicits {
+  /** Create a path that searches for immediate children of this path with the specified `field`. */
   def \ (field: PhpValueWrapper): PhpPath = PhpPath(path :+ PhpChildNode(field.value))
+
+  /** Create a path that searches for descendents of this path with the specified `field`. */
   def \\(field: PhpValueWrapper): PhpPath = PhpPath(path :+ PhpSearchNode(field.value))
 
+  /** Concatenate two paths. */
   def ++(that: PhpPath): PhpPath = PhpPath(this.path ++ that.path)
 
+  /** Extract all fields at this path from `value`. */
   def apply(value: PhpValue): Seq[PhpValue] = extractAll(value)
 
+  /**
+   * Extract all values at this path from `value`.
+   */
   def extractAll(value: PhpValue): Seq[PhpValue] =
     path.foldLeft(List(value))((accum, node) => accum.flatMap(node.apply))
 
+  /**
+   * Extract a single value at this path from `value`.
+   *
+   * If multiple matching values are present, a `PhpError` is returned.
+   */
   def extractOne(value: PhpValue): PhpResult[PhpValue] = (this apply value) match {
     case Nil        => PhpError(this, "error.path.missing")
     case ans :: Nil => PhpSuccess(ans)
     case _          => PhpError(this, "error.path.result.multiple")
   }
 
+  /**
+   * Create a `PhpReads` that extracts a value of type `A`
+   * from this location in a `PhpValue`.
+   */
   def read[A](implicit r: PhpReads[A]): PhpReads[A] =
     PhpReads[A] { value =>
       extractOne(value).flatMap(r.reads(_).repath(this))
     }
 
-  override def toString = "PhpPath(" + ("__" +: path.map(_.pathString)).mkString(" ") + ")"
+  override def toString: String =
+    "PhpPath(" + ("__" +: path.map(_.pathString)).mkString(" ") + ")"
 }
 
-sealed trait PhpPathNode {
+private[php] sealed trait PhpPathNode {
   def field: PhpValue
 
   def apply(value: PhpValue): Seq[PhpValue]
@@ -60,12 +90,12 @@ sealed trait PhpPathNode {
   }
 }
 
-case class PhpChildNode(field: PhpValue) extends PhpPathNode {
+private[php] case class PhpChildNode(field: PhpValue) extends PhpPathNode {
   def apply(value: PhpValue): Seq[PhpValue] =
     Seq(value \ field).filterNot(_ == PhpUndefined)
 }
 
-case class PhpSearchNode(field: PhpValue) extends PhpPathNode {
+private[php] case class PhpSearchNode(field: PhpValue) extends PhpPathNode {
   def apply(value: PhpValue): Seq[PhpValue] =
     (value \\ field).filterNot(_ == PhpUndefined)
 }
